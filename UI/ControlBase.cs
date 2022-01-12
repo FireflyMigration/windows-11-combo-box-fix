@@ -1922,9 +1922,38 @@ namespace Firefly.Box.UI.Advanced
             return false;
         }
 
+        bool _inWmPrint;
+        protected override void WndProc(ref Message m)
+        {
+            if (m.Msg == 0x317 || m.Msg == 0x318) // WM_PRINT
+            {
+                _inWmPrint = true;
+                try
+                {
+                    base.WndProc(ref m);
+                }
+                finally
+                {
+                    _inWmPrint = false;
+                }
+                return;
+            }
+            base.WndProc(ref m);
+        }
+
+        internal virtual bool PaintOnlyBackgroundOnWmPrint()
+        {
+            return false;
+        }
+
         #region Background Drawing
         protected override void OnPaint(System.Windows.Forms.PaintEventArgs e)
         {
+            if (_inWmPrint && PaintOnlyBackgroundOnWmPrint())
+            {
+                PaintOnlyMyBackground(e);
+                return;
+            }
             if (!IsPaintedByParent())
             {
                 if (e.ClipRectangle.IsEmpty) return;

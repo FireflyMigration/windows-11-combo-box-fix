@@ -210,6 +210,7 @@ namespace Firefly.Box.UI
             void UnFocus();
             void OnLostFocus(Func<bool> hideTheCombo);
             void MouseDownInContainer();
+            bool IsVisible();
         }
 
         class AlwaysVisible : InnerComboVisibility
@@ -237,6 +238,11 @@ namespace Firefly.Box.UI
 
             public void MouseDownInContainer()
             {
+            }
+
+            public bool IsVisible()
+            {
+                return true;
             }
         }
 
@@ -285,6 +291,11 @@ namespace Firefly.Box.UI
             {
                 if (_parent._IgnoreUserInput() || !_innerControlVisible) return;
                 _parent._combo.DroppedDown = true;
+            }
+
+            public bool IsVisible()
+            {
+                return _innerControlVisible;
             }
         }
 
@@ -1024,6 +1035,10 @@ namespace Firefly.Box.UI
         [Browsable(false)]
         public bool ForceBoxVisibleWhileDroppedDown { get; set; }
 
+        internal override bool PaintOnlyBackgroundOnWmPrint()
+        {
+            return _innerComboVisibility.IsVisible();
+        }
     }
 
 }
